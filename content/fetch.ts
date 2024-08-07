@@ -1,8 +1,12 @@
-export const contentGqlFetcher = async (
-  query: string,
+export const contentGqlFetcher = async <T>({
+  query,
   variables = {},
-  preview = false
-) => {
+  preview = false,
+}: {
+  query: string;
+  variables?: any;
+  preview?: boolean;
+}): Promise<T | undefined> => {
   const res = await fetch(
     `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
     {
@@ -10,8 +14,8 @@ export const contentGqlFetcher = async (
       headers: {
         'Content-Type': 'application/json',
         Authorization: preview
-          ? `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`
-          : `Bearer ${process.env.CONTENT}`,
+          ? `Bearer ${process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN}`
+          : `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query, variables }),
     }
@@ -23,5 +27,5 @@ export const contentGqlFetcher = async (
   if (errors) {
     console.log(errors);
     throw new Error('Could not get content.');
-  } else return data;
+  } else return data as T;
 };
