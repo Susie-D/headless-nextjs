@@ -1,5 +1,33 @@
-import { HeroQuery } from '@/types';
+import { HeroQuery, LogoWallQuery } from '@/types';
 import { contentGqlFetcher } from './fetch';
+import { error } from 'console';
+
+export const getContentForLogoWall = async () => {
+  const query = `#graphql
+  query AssetCollection($where: AssetFilter) {
+    assetCollection(where: $where) {
+      items {
+        width
+        url
+        title
+        height
+      }
+    }
+  }`;
+  const data = await contentGqlFetcher<LogoWallQuery>({
+    query,
+    variables: {
+      where: {
+        title_contains: 'client',
+      },
+    },
+  });
+
+  if (!data) {
+    throw new Error('oops');
+  }
+  return data;
+};
 
 export const getContentForHero = async () => {
   const query = `#graphql
@@ -19,9 +47,9 @@ export const getContentForHero = async () => {
         }
     }
     `;
-  const data = await contentGqlFetcher<HeroQuery>({ query }); 
+  const data = await contentGqlFetcher<HeroQuery>({ query });
   if (!data) {
-    throw Error('oops')
+    throw Error('oops');
   }
   return data;
 };
